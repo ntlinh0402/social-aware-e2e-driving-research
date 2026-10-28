@@ -1,0 +1,21 @@
+{
+  "run_id": "diffusiondrive_il_navtest_pilot_n50_20261029-0021",
+  "model": "diffusiondrive_il",
+  "checkpoint_file": "/home/linh/navsim_workspace/DiffusionDriveV2/ckpts/diffusiondrive_navsim_88p1_PDMS",
+  "checkpoint_sha256": "008ffc39cc6c57ff9007025217e601f408818afa036c0bae4e543907993a005b",
+  "split": "navtest",
+  "subset": "pilot_n50",
+  "num_tokens": 50,
+  "trajectory_sampling": {
+    "num_poses": 8,
+    "time_horizon": 4.0,
+    "interval_length": 0.5
+  },
+  "repo_commits": {
+    "DiffusionDriveV2": "1cd12a1e155c34dcc471261835444c8d5587580b",
+    "research": "f9ae6afd8342ae2c262c956e2bf0d5b9fa7320c2"
+  },
+  "device": "cuda",
+  "batch_size": 1,
+  "created_at": "2026-10-29T00:21:02"
+}

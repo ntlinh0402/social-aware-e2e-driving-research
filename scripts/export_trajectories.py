@@ -75,9 +75,14 @@ def git_head(repo_dir: Path) -> str:
         return "unknown"
 
 
-def build_agent_and_loader(agent_key: str, ckpt: Path, split: str, max_scenes: int, config_dir: Path):
-    """Use hydra to compose the standard submission config, then override agent + scene filter."""
+def build_agent_and_loader(agent_key: str, ckpt: Path, split: str, max_scenes: int, config_dir: Path, available_logs: set | None = None):
+    """Use hydra to compose the standard submission config, then override agent + scene filter.
+
+    When `available_logs` is provided, intersect scene_filter.log_names with it so pilot runs
+    only touch logs whose sensor data is actually on disk.
+    """
     from navsim.common.dataloader import SceneLoader  # noqa: F401 (ensures navsim import path works)
+    from omegaconf import OmegaConf
 
     # Hydra config dir sits inside the DDv2 repo
     with initialize_config_dir(config_dir=str(config_dir), version_base=None):
@@ -95,6 +100,14 @@ def build_agent_and_loader(agent_key: str, ckpt: Path, split: str, max_scenes: i
         ]
         overrides = [o for o in overrides if o]
         cfg = compose(config_name="default_run_create_submission_pickle", overrides=overrides)
+
+    if available_logs is not None:
+        original = list(cfg.train_test_split.scene_filter.log_names)
+        kept = [n for n in original if n in available_logs]
+        logger.info("intersect log_names: %d -> %d available on disk", len(original), len(kept))
+        if not kept:
+            raise RuntimeError("No overlap between navtest log_names and available sensor logs")
+        OmegaConf.update(cfg, "train_test_split.scene_filter.log_names", kept, merge=False)
 
     agent = instantiate(cfg.agent)
     scene_filter = instantiate(cfg.train_test_split.scene_filter)
@@ -116,7 +129,8 @@ def run_inference_loop(agent, scene_loader, device: str) -> dict:
     agent = agent.to(device)
     agent.eval()
     output = {}
-    for token in tqdm(scene_loader, desc="inference"):
+    tokens = list(scene_loader.tokens)
+    for token in tqdm(tokens, desc="inference"):
         try:
             agent_input = scene_loader.get_agent_input_from_token(token)
             features = {}
@@ -143,6 +157,8 @@ def main():
     ap.add_argument("--subset-label", default=None, help="label used in run_id; default auto")
     ap.add_argument("--out", required=True, type=Path, help="base handoff dir (research/handoff)")
     ap.add_argument("--device", default="cuda")
+    ap.add_argument("--only-available-logs", action="store_true",
+                    help="restrict scene_filter.log_names to logs with sensor_blobs on disk")
     args = ap.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -152,12 +168,41 @@ def main():
     if not config_dir.is_dir():
         sys.exit(f"config dir not found: {config_dir}")
 
-    data_path = Path(os.environ["OPENSCENE_DATA_ROOT"]) / "test_navsim_logs"
-    sensor_blobs = Path(os.environ["OPENSCENE_DATA_ROOT"]) / "test_sensor_blobs"
+    def _pick_leaf(root: Path, want_dirs: bool) -> Path:
+        # HF unpacks under <root>/test/ — pick that if present.
+        for cand in (root / "test", root):
+            if not cand.is_dir():
+                continue
+            if want_dirs:
+                has = any(c.is_dir() and c.name != "test" for c in cand.iterdir())
+            else:
+                has = any(c.suffix == ".pkl" for c in cand.iterdir())
+            if has:
+                return cand
+        return root
+
+    data_path = _pick_leaf(Path(os.environ["OPENSCENE_DATA_ROOT"]) / "test_navsim_logs", want_dirs=False)
+    sensor_blobs = _pick_leaf(Path(os.environ["OPENSCENE_DATA_ROOT"]) / "test_sensor_blobs", want_dirs=True)
+    logger.info("data_path=%s sensor_blobs=%s", data_path, sensor_blobs)
+
+    available = None
+    if args.only_available_logs:
+        # DiffusionDrive agents need both cameras and lidar PCDs — require both to be present.
+        dirs = []
+        for d in sensor_blobs.iterdir():
+            if not d.is_dir() or d.name == "test":
+                continue
+            has_cam = any((d / f"CAM_{c}").is_dir() for c in ("F0", "L0", "L1", "L2", "R0", "R1", "R2", "B0"))
+            has_lidar = (d / "MergedPointCloud").is_dir()
+            if has_cam and has_lidar:
+                dirs.append(d.name)
+        available = set(dirs)
+        logger.info("logs with both camera + lidar on disk: %d", len(available))
 
     # Build agent + scene filter via hydra
     agent, scene_filter, cfg = build_agent_and_loader(
         args.agent, args.ckpt.resolve(), args.split, args.max_scenes, config_dir,
+        available_logs=available,
     )
     agent.initialize()  # load checkpoint
 
