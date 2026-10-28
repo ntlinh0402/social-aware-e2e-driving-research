@@ -8,10 +8,12 @@
 - Vướng mắc:
 
 ## MAC
-- Trạng thái máy: Darwin arm64, Apple M5, RAM 16 GB, ổ trống ~809 GiB; chưa có conda/mamba, tmux — cập nhật lần cuối: 2026-10-28
-- Đang làm: A1 (cài env navsim_v2) — đang chờ có conda
-- Đã xong: tạo STATUS.md; clone NAVSIM main vào ~/navsim_workspace/navsim (env cần python 3.9, torch 2.0.1, numpy 1.23.4)
+- Trạng thái máy: Darwin arm64, Apple M5, RAM 16 GB, ổ trống ~800 GiB; Miniforge ở ~/miniforge3 (chưa `conda init`, gọi bằng đường dẫn đầy đủ); chưa có tmux — cập nhật lần cuối: 2026-10-28
+- Đang làm: A1 — metric caching split mini (chạy nền), sau đó chạy ConstantVelocity non_reactive / reactive
+- Đã xong: STATUS.md; clone NAVSIM main (0a380a9) vào ~/navsim_workspace/navsim; env navsim_v2 (python 3.9, torch 2.0.1, numpy 1.23.4); tải maps + navsim_logs/mini (chưa tải sensor_blobs mini)
 - Handoff đã xử lý: (chưa có)
-- Vướng mắc: chưa cài conda. Tải/cài Miniforge (arm64) bị chặn bởi quyền của phiên, cần người dùng cho phép hoặc tự cài.
+- Vướng mắc / lỗi đã sửa:
+  - `pip install nuplan-devkit @ git+...` lỗi "could not create 'build/lib/docs'" do file `BUILD` trùng thư mục `build` trên macOS (filesystem không phân biệt hoa thường). Cách xử lý: clone nuplan-devkit (ce3c323) vào ~/navsim_workspace/dl/nuplan-devkit, xóa file BUILD trong bản clone đó, cài từ đường dẫn cục bộ (requirements: dl/req_local.txt). Không sửa code NAVSIM.
+  - run_pdm_score_one_stage cần metric cache trước: chạy run_metric_caching.py train_test_split=mini.
 
 ## Việc tiếp theo (người dùng quyết định)
