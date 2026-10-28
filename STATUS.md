@@ -9,8 +9,8 @@
 
 ## MAC
 - Trạng thái máy: Darwin arm64, Apple M5, RAM 16 GB, ổ trống ~800 GiB; Miniforge ở ~/miniforge3 (chưa `conda init`, gọi bằng đường dẫn đầy đủ); chưa có tmux — cập nhật lần cuối: 2026-10-28
-- Đang làm: A1 — metric caching split mini (chạy nền), sau đó chạy ConstantVelocity non_reactive / reactive
-- Đã xong: STATUS.md; clone NAVSIM main (0a380a9) vào ~/navsim_workspace/navsim; env navsim_v2 (python 3.9, torch 2.0.1, numpy 1.23.4); tải maps + navsim_logs/mini (chưa tải sensor_blobs mini)
+- Đang làm: A1 — ConstantVelocity mini: non_reactive đã chạy xong 3615/3615 (log logs/A1_cv_non_reactive_20261028-1249.log, chưa đọc điểm); reactive bị gián đoạn khi máy gập (~111/3615), cần chạy lại
+- Đã xong: STATUS.md; clone NAVSIM main (0a380a9) vào ~/navsim_workspace/navsim; env navsim_v2 (python 3.9, torch 2.0.1, numpy 1.23.4); tải maps + navsim_logs/mini (chưa tải sensor_blobs mini); metric cache mini xong (exp/metric_cache)
 - Handoff đã xử lý: (chưa có)
 - Vướng mắc / lỗi đã sửa:
   - `pip install nuplan-devkit @ git+...` lỗi "could not create 'build/lib/docs'" do file `BUILD` trùng thư mục `build` trên macOS (filesystem không phân biệt hoa thường). Cách xử lý: clone nuplan-devkit (ce3c323) vào ~/navsim_workspace/dl/nuplan-devkit, xóa file BUILD trong bản clone đó, cài từ đường dẫn cục bộ (requirements: dl/req_local.txt). Không sửa code NAVSIM.
