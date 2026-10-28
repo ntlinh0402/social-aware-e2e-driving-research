@@ -1,11 +1,11 @@
 # STATUS
 
 ## LAPTOP
-- Trạng thái máy: (chưa cập nhật) — cập nhật lần cuối: —
-- Đang làm:
-- Đã xong:
-- Handoff mới nhất:
-- Vướng mắc:
+- Trạng thái máy: ASUS TUF A17 FA706II, Windows 11 Home (build 26200), **1 ổ Kingston NVMe SSD 512 GB** (C:42 GB / O:108 GB / F:115 GB trống — **không có HDD** như CLAUDE.md giả định), RAM 16 GB (tốt hơn 8 GB brief đoán), GPU **NVIDIA GTX 1650 Ti 4 GB** (driver 32.0.15.9200) + iGPU AMD Radeon. WSL2 đã bật, chưa cài distro. Repo clone sẵn ở `O:\research`. — cập nhật lần cuối: 2026-10-28
+- Đang làm: A3 — chuẩn bị cài **WSL2 Ubuntu-22.04** làm env Linux cho stack ddv2 (quyết định: không boot dual-boot để giữ Windows làm việc song song; CUDA passthrough qua WSL2 với driver mới ổn với GTX 1650 Ti).
+- Đã xong: xác định phần cứng; chọn hướng OS (WSL2 Ubuntu-22.04); chốt layout đường dẫn: `~/navsim_workspace/research` → symlink tới `/mnt/o/research`, `dataset` → `/mnt/f/navsim_dataset`, `DiffusionDriveV2` + `exp` nằm trong WSL ext4.
+- Handoff mới nhất: (chưa có)
+- Vướng mắc: chưa có; chờ user chạy `wsl --install -d Ubuntu-22.04` trong PowerShell admin, sau đó tiếp tục A3 (swap, conda, env ddv2, checkpoint).
 
 ## MAC
 - Trạng thái máy: Darwin arm64, Apple M5, RAM 16 GB, ổ trống ~800 GiB; Miniforge ở ~/miniforge3 (chưa `conda init`, gọi bằng đường dẫn đầy đủ); chưa có tmux — cập nhật lần cuối: 2026-10-28
