@@ -19,7 +19,7 @@ Nghiên cứu xem **RL post-training có làm planner end-to-end (E2E) "chèn é
 
 | | **LAPTOP** | **MAC** |
 |---|---|---|
-| Phần cứng | ASUS TUF FX705, Ryzen 7 3750H (4C/8T), GPU NVIDIA GTX (4–6 GB VRAM), **RAM 8 GB (không nâng được)**, SSD + HDD 1 TB | MacBook Pro M5 (Apple Silicon, không có CUDA) |
+| Phần cứng | ASUS TUF FX705, Ryzen 7 3750H (4C/8T), GPU NVIDIA GTX (4–6 GB VRAM), **RAM 16 GB**, SSD + HDD 1 TB | MacBook Pro M5 (Apple Silicon, không có CUDA) |
 | Hệ điều hành | Ubuntu 22.04 (dual boot) | macOS |
 | Vai trò | **Chạy mô hình → xuất quỹ đạo** | **Mô phỏng NAVSIM, IDM, chấm PDMS/EPDMS, tính chỉ số social, phân tích, viết báo cáo** |
 | Env conda | `ddv2` | `navsim_v1` (NAVSIM nhánh `v1.1`, chấm PDMS), `navsim_v2` (NAVSIM `main`, reactive IDM) |
@@ -131,7 +131,7 @@ export OPENSCENE_DATA_ROOT="$HOME/navsim_workspace/dataset"
 ```
 Trước mỗi lệnh quan trọng: in env đang active và `NAVSIM_DEVKIT_ROOT`.
 
-## 5. Quy tắc riêng cho LAPTOP (RAM 8 GB)
+## 5. Quy tắc riêng cho LAPTOP (RAM 16 GB)
 
 - Dùng Ubuntu nhẹ, tắt mọi ứng dụng không cần thiết khi chạy.
 - Tạo **swap 16–32 GB trên SSD** (không đặt trên HDD). Có thể bật thêm `zram`. Ghi cấu hình vào `STATUS.md`.
